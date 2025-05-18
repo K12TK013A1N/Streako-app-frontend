@@ -54,7 +54,29 @@ export default function GroupDetail() {
   };
 
   //handler for invite button
-  
+  const handleInvite = async () =>{
+    setInviting(true);
+    setInviteError(null);
+
+    const {data,error} = await supabase.functions.invoke('invite_user', {
+      body: JSON.stringify({"group_id":groupId})
+    })
+
+    setInviting(false);
+
+    if(error){
+      console.error('invite_user error', error);
+      setInviteError(error.message)
+    }else{
+      const fullUrl = `${window.location.origin}${data.invite_link}`;
+      setInviteLink(fullUrl);
+    }
+  };
+
+  //copy to clipboard
+  const copyLink = ()=>{
+    navigator.clipboard.writeText(fullUrl);
+  }
 
   if (loading) return <div className="container">Loading members…</div>;
 
@@ -64,6 +86,35 @@ export default function GroupDetail() {
   return (
     <div className="container">
       <h2>Group Members & Streaks</h2>
+      {/*Invite section*/}
+      <div style={{ margin: '1rem 0', border: '1px solid #ddd', padding: '0.75rem' }}>
+        <button
+          onClick={handleInvite}
+          disabled={inviting}
+          style={{ padding: '0.5rem 1rem' }}
+        >
+          {inviting ? 'Generating Link…' : 'Invite Member'}
+        </button>
+
+        {inviteError && (
+          <p style={{ color: 'red', marginTop: '0.5rem' }}>{inviteError}</p>
+        )}
+
+        {inviteLink && (
+          <div style={{ marginTop: '0.75rem', display: 'flex', alignItems: 'center' }}>
+            <input
+              type="text"
+              readOnly
+              value={inviteLink}
+              style={{ flex: 1, marginRight: '0.5rem', padding: '0.5rem' }}
+            />
+            <button onClick={copyLink} style={{ padding: '0.5rem' }}>
+              Copy
+            </button>
+          </div>
+        )}
+      </div>
+
       <button onClick={() => setShowAll(!showAll)} style={{ margin: '1rem 0' }}>
         {showAll ? 'Show Last 10 Days Only' : 'Show Full History'}
       </button>

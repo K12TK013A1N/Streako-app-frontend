@@ -5,6 +5,7 @@ import Dashboard from './components/Dashboard/Dashboard'
 import useAuth from './hooks/useAuth'
 import CreateGroup from './components/Dashboard/CreateGroup'
 import GroupDetail from './components/Dashboard/GroupDetail'
+import AcceptInvite from './components/Auth/AcceptInvite';
 
 export default function App() {
   const { user, loading } = useAuth()
@@ -26,6 +27,7 @@ export default function App() {
           path="/group/:groupId"
           element={user ? <GroupDetail /> : <Navigate to="/signin" />}
         />
+        <Route path="/accept-invite" element={<AcceptInvite />} />
         <Route path="/" element={<Navigate to={user ? '/dashboard' : '/signin'} />} />
       </Routes>
     </BrowserRouter>
