@@ -6,11 +6,12 @@ import { supabase } from '../../services/supabaseClient';
 import useAuth from '../../hooks/useAuth';
 
 export default function AcceptInvite() {
+  const location = useLocation();             // gives us pathname + search
+  const currentUrl = location.pathname + location.search;
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token');
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
-  const location = useLocation();
 
   const [status, setStatus] = useState('loading'); // 'loading' | 'error' | 'success'
   const [errorMsg, setErrorMsg] = useState('');
