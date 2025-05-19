@@ -23,15 +23,13 @@ export default function SignIn() {
     };
   }, [navigate, redirectTo]);
 
-  const handleGoogle = () => {
+    const handleGoogle = () =>
     supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: `${window.location.origin}/accept-invite?token=` +
-                    encodeURIComponent(searchParams.get('token') || '')
-      }
+        redirectTo: window.location.origin + '/signin',
+      },
     });
-  };
 
   return (
     <div className="relative min-h-screen flex items-center justify-center bg-white overflow-hidden">
