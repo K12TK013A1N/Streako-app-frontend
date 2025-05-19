@@ -1,7 +1,7 @@
 // src/components/Auth/AcceptInvite.jsx
 
 import React, { useEffect, useState } from 'react';
-import { useSearchParams, useNavigate } from 'react-router-dom';
+import { useSearchParams, useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '../../services/supabaseClient';
 import useAuth from '../../hooks/useAuth';
 
@@ -10,6 +10,7 @@ export default function AcceptInvite() {
   const token = searchParams.get('token');
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
+  const location = useLocation();
 
   const [status, setStatus] = useState('loading'); // 'loading' | 'error' | 'success'
   const [errorMsg, setErrorMsg] = useState('');
@@ -17,10 +18,11 @@ export default function AcceptInvite() {
   // Step 1: If not logged in, redirect to signin, preserving this token
   useEffect(() => {
     if (!authLoading && !user) {
-      // Pass the current path so we can come back after sign in
-      navigate(`/signin?redirect=/accept-invite?token=${token}`, { replace: true });
+      // urlencode entire path+search
+      const redirectParam = encodeURIComponent(currentUrl);
+      navigate(`/signin?redirect=${redirectParam}`, { replace: true });
     }
-  }, [authLoading, user, navigate, token]);
+  }, [authLoading, user, navigate, currentUrl]);
 
   // Step 2: Once logged in and token present, call accept_invite
   useEffect(() => {

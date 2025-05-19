@@ -8,14 +8,15 @@ import TextCarousel from '../Dashboard/TextCarousel';
 export default function SignIn() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const redirectTo = searchParams.get('redirect') || '/dashboard';
+  const rawRedirect = searchParams.get('redirect') || '/dashboard';
+  const redirectTo = window.location.origin + rawRedirect;
 
   // If URL contains `?access_token=…`, Supabase just redirected back
   // Let supabase-js pick that up and then navigate on session change
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       if (session) {
-        navigate(redirectTo, { replace: true });
+        window.location.href = redirectTo;    // force full reload so the hash fragment is preserved
       }
     });
     return () => {
@@ -27,7 +28,7 @@ export default function SignIn() {
     supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: window.location.origin + '/signin',
+        redirectTo,
       },
     });
 
