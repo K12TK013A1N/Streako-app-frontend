@@ -7,7 +7,7 @@ import useAuth from '../../hooks/useAuth';
 
 export default function AcceptInvite() {
   const location = useLocation();             // gives us pathname + search
-  const currentUrl = location.pathname + location.search;
+  const currentUrl = location.pathname + location.search; 
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token');
   const navigate = useNavigate();

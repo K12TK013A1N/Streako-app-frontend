@@ -3,6 +3,7 @@ import { useParams,useNavigate } from 'react-router-dom';
 import { supabase } from '../../services/supabaseClient';
 import useAuth from "../../hooks/useAuth"
 import InviteModal from './InviteModal';
+import LeaveModal from './LeaveModal';
 
 export default function GroupDetail() {
   const { groupId } = useParams();
@@ -16,6 +17,8 @@ export default function GroupDetail() {
   const [loading, setLoading]   = useState(true);
   const [logging, setLogging]   = useState(false);
   const [showInvite, setShowInvite] = useState(false);
+  const [showLeave, setShowLeave] = useState(false);
+  const [leaving, setLeaving] = useState(false);
 
   // Fetch session once
   useEffect(() => {
@@ -110,6 +113,20 @@ export default function GroupDetail() {
     return d.toISOString().slice(0,10);
   });
 
+  // If user decides to confirm the leave
+  const handleLeaveConfirm = async () => {
+    setLeaving(true);
+    const { error } = await supabase.functions.invoke('leave_group', {
+      body: JSON.stringify({ group_id: groupId }),
+    });
+    setLeaving(false);
+    if (error) {
+      alert('Failed to leave: ' + error.message);
+    } else {
+      navigate('/dashboard');
+    }
+  };
+
   return (
     <div className="relative min-h-screen bg-gray-50 pb-12">
       {/* Header */}
@@ -138,6 +155,19 @@ export default function GroupDetail() {
                 <path strokeLinecap="round" strokeLinejoin="round" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-6-6h.01M12 6v12" />
               </svg>
               Invite Friends
+            </button>
+            {/* Leave Group */}
+            <button
+              onClick={() => setShowLeave(true)}
+              disabled={leaving}
+              className={`inline-flex items-center px-3 py-1 border border-red-500 text-red-500 rounded-lg hover:bg-red-50 transition ${
+                leaving ? 'opacity-50 cursor-not-allowed' : ''
+              }`}
+            >
+              <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7" />
+              </svg>
+              Leave Group
             </button>
           </div>
         </div>
@@ -214,6 +244,15 @@ export default function GroupDetail() {
          onClose={() => setShowInvite(false)}
        />
      )}
+      {/* Leave Confirmation Modal */}
+      {showLeave && (
+        <LeaveModal
+          groupName={group?.name}
+          loading={leaving}
+          onCancel={() => setShowLeave(false)}
+          onConfirm={handleLeaveConfirm}
+        />
+      )}
     </div>
   );
 }
